@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/content/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/content/style.css">
+    <script src="/static/scripts/jquery-1.10.2.min.js"></script>
+</head>
+<body>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="messagebox" class="border border-success">
+                </div>
+                <div id="userInput">
+                    <input id="userMessage" class="form-control" type="text" name="msg" placeholder="Message">
+                    <input id="sendButton" class="btn btn-success form-control" type="submit" value="Send">
+                </div>
+            </div>
+        </div>
+        <script>
+            function getCompletion() {
+                let userText = $("#userMessage").val();
+                let userHtml = '<p class="userText"><span>' + userText + '</span></p>';
+                $("#userMessage").val("");
+                $("#messagebox").append(userHtml);
+                document.getElementById('userInput').scrollIntoView({ block: 'start', behavior: 'smooth' });
+                $.get("/get", { msg: userText }).done(function (data) {
+                    var assistantHTML = '<p class="assistantText"><span>' + data + '</span></p>';
+                    $("#messagebox").append(assistantHTML);
+                    document.getElementById('userInput').scrollIntoView({ block: 'start', behavior: 'smooth' });
+                });
+            }
+            $("#userMessage").keypress(function (e) {
+                // allows message to be sent with enter key
+                if (e.which == 13) {
+                    getCompletion();
+                }
+            });
+            // allows message to be sent by clicking the Send button
+            $("#sendButton").click(function () {
+                getCompletion();
+            });
+        </script>
+    </div>
+</body>
+</html>
