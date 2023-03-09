@@ -1,0 +1,31 @@
+body {
+    background-color: #454654;
+}
+
+.userText {
+    color: white;
+    font-family: 'Segoe UI'; 
+    font-size: 14px;
+    text-align: right;
+    line-height: 30px;
+}
+
+    .userText span {
+        background-color: #009688;
+        padding: 10px;
+        border-radius: 2px;
+    }
+
+.assistantText {
+    color: white;
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    text-align: left;
+    line-height: 30px;
+}
+
+    .assistantText span {
+        background-color: #343541;
+        padding: 10px;
+        border-radius: 2px;
+    }
