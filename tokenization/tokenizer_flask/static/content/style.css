@@ -1,0 +1,101 @@
+body {
+    background-color: #454654;
+}
+
+.userText {
+    color: white;
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    text-align: left;
+    line-height: 30px;
+}
+
+.form-check-label {
+    color: white;
+    font-family: 'Segoe UI';
+    font-size: 12px;
+}
+
+.highlight {
+    background-color: yellow;
+}
+
+.card-body {
+    color: white;
+    font-family: 'Segoe UI';
+    font-size: 30px;
+    text-align: left;
+    line-height: 30px;
+    border: thin;
+    border-color: aqua
+}
+
+.userText span {
+    background-color: #27B5EA66;
+}
+
+.tokenizedResults {
+    color: white;
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    text-align: left;
+    line-height: 30px;
+}
+
+
+.tokenizedResults span {
+    padding: 0;
+    border-radius: 2px;
+    word-wrap: break-word;
+}
+
+.bg-color-0 {
+    background-color: #6B40D84D;
+    display: inline;
+}
+
+.bg-color-1 {
+    background-color: #68DE7A66;
+    display: inline;
+}
+
+.bg-color-2 {
+    background-color: #F4AC3666;
+    display: inline;
+}
+
+.bg-color-3 {
+    background-color: #27B5EA66;
+    display: inline;
+}
+
+.bg-color-4 {
+    background-color: #Ef414666;
+    display: inline;
+}
+
+.btn-custom {
+    width: 100px;
+    margin-left: 0px;
+    margin-right: 2px;
+}
+
+
+.btn-clear {
+    background-color: #Ef414666;
+    color: white;
+}
+
+.tokenizedResults span.bg-color-0,
+.tokenizedResults span.bg-color-1,
+.tokenizedResults span.bg-color-2,
+.tokenizedResults span.bg-color-3,
+.tokenizedResults span.bg-color-4 {
+    padding: 1px 5px;
+    margin: 0;
+}
+
+.btn-disabled {
+    background-color: #ccc;
+    border-color: #ccc;
+}
