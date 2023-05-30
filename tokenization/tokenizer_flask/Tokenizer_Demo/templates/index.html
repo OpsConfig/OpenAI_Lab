@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/content/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/content/style.css">
+    <script src="/static/scripts/jquery-1.10.2.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card shadow">
+                                    <div class="card-body">
+                                        <h6>Token Count</h6>
+                                        <p class="text-center">{{length}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow">
+                                    <div class="card-body">
+                                        <h6>Character Count</h6>
+                                        <p class="text-center">{{ character_count }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="messagebox" class="border border-success">
+                    <div id="userInput">
+                        <textarea id="userText" class="form-control" name="msg" rows="9" placeholder="Enter text to tokenize here" style="resize:both" value="This is an example text for tokenization.">Tokenization is the process of splitting the input and output texts into smaller units that can be processed by the LLM AI models. Tokens can be words, characters, subwords, or symbols, depending on the type and the size of the model. Tokenization can help the model to handle different languages, vocabularies, and formats, and to reduce the computational and memory costs. Tokenization can also affect the quality and the diversity of the generated texts, by influencing the meaning and the context of the tokens. Tokenization can be done using different methods, such as rule-based, statistical, or neural, depending on the complexity and the variability of the texts.
+
+OpenAI and Azure OpenAI uses a subword tokenization method called "Byte-Pair Encoding (BPE)" for its GPT-based models. BPE is a method that merges the most frequently occurring pairs of characters or bytes into a single token, until a certain number of tokens or a vocabulary size is reached. BPE can help the model to handle rare or unseen words, and to create more compact and consistent representations of the texts. BPE can also allow the model to generate new words or tokens, by combining existing ones. Example text excerpt from: https://learn.microsoft.com/en-us/semantic-kernel/concepts-ai/tokens </textarea>                        <div class="btn-container">
+                            <input id="sendButton" class="btn btn-success btn-custom" type="submit" value="Tokenize">
+                            <input id="clearButton" class="btn btn-clear btn-custom" type="button" value="Clear">
+                            <input id="showEncode" class="form-check-input" type="checkbox" checked />
+                            <label class="form-check-label" for="showEncode">Encoding</label>
+                            <input id="showQuote" class="form-check-input" type="checkbox" unchecked>
+                            <label class="form-check-label" for="showQuote">Quote boundaries</label>
+                            <input id="showColor" class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label" for="showColor">Color boundaries</label>
+                            <select id="tokenizer" class="custom-select">
+                                <option value="cl100k_base" selected>cl100k_base</option>
+                                <option value="p50k_base">p50k_base</option>
+                                <option value="r50k_base">r50k_base</option>
+                                <option value="cl100k_base">gpt-4</option>
+                                <option value="cl100k_base">gpt-3.5-turbo</option>
+                                <option value="cl100k_base">text-embedding-ada-002</option>
+                                <option value="p50k_base">text-davinci-003</option>
+                                <option value="p50k_base">codex series</option>
+                                <option value="r50k_base">old embeddings</option>
+                                <option value="gpt2">gpt2</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="outputElement">
+                </div>
+            </div>
+        </div>
+    </div>
+ <script>
+var isTokenized = false;
+function processTokens() {
+    if (isTokenized) {
+        return;
+    }
+    let userText = $("#userText").val();
+    let tokenizer = $("#tokenizer").val();
+
+
+    document.getElementById('userInput').scrollIntoView({ block: 'start', behavior: 'smooth' });
+
+    $.get("/get", { msg: userText, tokenizer: tokenizer }).done(function (data) {
+        var response_data = JSON.parse(data);
+        var token_list = response_data.token_list;
+        var encode = response_data.encode;
+        var length = response_data.length;
+        var character_count = response_data.character_count;
+
+        $('.card-body .text-center').eq(0).html(length);
+        $('.card-body .text-center').eq(1).html(character_count);
+        $('.card-body .text-center').eq(2).html(encode);
+
+        var count = 0;
+        var colorHTML = '<br><p class="tokenizedResults">';
+        token_list = token_list.map(token => token.slice(1, -1));
+        var quoteHTML = '<br><p class="tokenizedResults"><span>' + token_list.map(token => '"' + token + '"').join(' ') + '</span></p>';
+        var encodingHTML = '<br><p class="tokenizedResults">';
+        encode.forEach(function (byte, index) {
+            encodingHTML += '<span class="token-element" data-index="' + index + '">' + byte + '</span> ';
+        });
+        encodingHTML += '</p>';
+        if ($("#showEncode").is(":checked")) {
+            $("#outputElement").append(encodingHTML);
+        }
+        if ($("#showQuote").is(":checked")) {
+            $("#outputElement").append(quoteHTML);
+        }
+        if ($("#showColor").is(":checked")) {
+            colorHTML += '</p>';
+            const colorHtmlElement = $(colorHTML);
+
+            token_list.forEach(function (token, index) {
+                const span = $('<span>').addClass('token-element').addClass('bg-color-' + count).attr('data-index', index).text(token);
+                colorHtmlElement.append(span);
+                count = (count + 1) % 5;
+            });
+
+            $("#outputElement").append(colorHtmlElement);
+
+
+            $("#outputElement .token-element").hover(
+                function () {
+                    var index = $(this).data("index");
+                    highlightEncode(index);
+                },
+                function () {
+                    var index = $(this).data("index");
+                    unhighlightEncode(index);
+                }
+            );
+        }
+    });
+    isTokenized = true;
+    $("#sendButton").prop("disabled", true).addClass("btn-disabled");
+}
+
+$("#userText").keypress(function (e) {
+    // allows message to be sent with enter key only if not tokenized
+    if (e.which == 13 && !isTokenized) {
+        processTokens();
+    }
+});
+
+$("#sendButton").click(function () {
+    processTokens();
+});
+
+function clearContent() {
+    $("#outputElement").html("");
+    $('.card-body .text-center').eq(0).html("0");
+    $('.card-body .text-center').eq(1).html("0");
+    isTokenized = false;
+    $("#sendButton").prop("disabled", false).removeClass("btn-disabled");
+}
+
+$("#clearButton").click(function () {
+    clearContent();
+});
+
+     function highlightEncode(index) {
+         var colorElement = $("#outputElement .token-element.bg-color-0[data-index='" + index + "'], #outputElement .token-element.bg-color-1[data-index='" + index + "'], #outputElement .token-element.bg-color-2[data-index='" + index + "'], #outputElement .token-element.bg-color-3[data-index='" + index + "'], #outputElement .token-element.bg-color-4[data-index='" + index + "']");
+         var originalColor = colorElement.css("background-color");
+
+         $("#outputElement .token-element[data-index='" + index + "']").each(function () {
+             $(this).data("original-background-color", $(this).css("background-color"));
+             $(this).data("original-text-color", $(this).css("color"));
+
+             $(this).css({
+                 "background-color": originalColor,
+                 "transform": "scale(2)",
+                 "position": "relative",
+                 "display": "inline-block",
+                 "z-index": "1"
+             });
+         });
+     }
+
+
+     function unhighlightEncode(index) {
+         $("#outputElement .token-element[data-index='" + index + "']").each(function () {
+             $(this).css({
+                 "background-color": $(this).data("original-background-color"),
+                 "color": $(this).data("original-text-color"),
+                 "transform": "",
+                 "position": "",
+                 "display": "",
+                 "z-index": ""
+             });
+         });
+     }
+ </script>
+</body>
+</html>

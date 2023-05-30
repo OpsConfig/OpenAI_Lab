@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/content/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/content/style.css">
+    <script src="/static/scripts/jquery-1.10.2.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card shadow">
+                                    <div class="card-body">
+                                        <h6>Token Count</h6>
+                                        <p class="text-center">{{length}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow">
+                                    <div class="card-body">
+                                        <h6>Character Count</h6>
+                                        <p class="text-center">{{ character_count }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="messagebox" class="border border-success">
+                    <div id="userInput">
+                        <input id="userText" class="form-control" type="text" name="msg" placeholder="Enter text to tokenize here">
+                        <div class="btn-container">
+                            <input id="sendButton" class="btn btn-success btn-custom" type="submit" value="Tokenize">
+                            <input id="clearButton" class="btn btn-clear btn-custom" type="button" value="Clear">
+                            <input id="showHTML" class="form-check-input" type="checkbox" checked />
+                            <label class="form-check-label" for="showHTML">User Input</label>
+                            <input id="showEncode" class="form-check-input" type="checkbox" checked />
+                            <label class="form-check-label" for="showEncode">Encoding</label>
+                            <input id="showQuote" class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label" for="showQuote">Quote boundaries</label>
+                            <input id="showColor" class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label" for="showColor">Color boundaries</label>
+                            <select id="tokenizer" class="custom-select">
+                                <option value="cl100k_base" selected>cl100k_base</option>
+                                <option value="p50k_base">p50k_base</option>
+                                <option value="r50k_base">r50k_base</option>
+                                <option value="cl100k_base">gpt-4</option>
+                                <option value="cl100k_base">gpt-3.5-turbo</option>
+                                <option value="cl100k_base">text-embedding-ada-002</option>
+                                <option value="p50k_base">text-davinci-003</option>
+                                <option value="p50k_base">codex series</option>
+                                <option value="r50k_base">old embeddings</option>
+                                <option value="gpt2">gpt2</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="test">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var isTokenized = false;
+        function processTokens() {
+            if (isTokenized) {
+                return;
+            }
+            let userText = $("#userText").val();
+            let tokenizer = $("#tokenizer").val(); 
+            let userHtml = '<br><p class="userText"><span>' + userText + '</span></p>';
+            $("#userText").val("");
+            if ($("#showHTML").is(":checked")) {
+                $("#test").append(userHtml);
+            }
+    
+            document.getElementById('userInput').scrollIntoView({ block: 'start', behavior: 'smooth' });
+
+            $.get("/get", { msg: userText, tokenizer: tokenizer }).done(function (data) {
+                var response_data = JSON.parse(data);
+                var token_list = response_data.token_list;
+                var encode = response_data.encode;
+                var length = response_data.length;
+                var character_count = response_data.character_count;
+
+                $('.card-body .text-center').eq(0).html(length);
+                $('.card-body .text-center').eq(1).html(character_count);
+                $('.card-body .text-center').eq(2).html(encode);
+
+                var count = 0;
+                var colorHTML = '<br><p class="tokenizedResults">';
+                token_list = token_list.map(token => token.slice(1, -1));
+                var quoteHTML = '<br><p class="tokenizedResults"><span>' + token_list.map(token => '"' + token + '"').join(' ') + '</span></p>';
+                var encodingHTML = '<br><p class="tokenizedResults">';
+                encode.forEach(function (byte, index) {
+                    encodingHTML += '<span data-index="' + index + '">' + byte + '</span> ';
+                });
+                encodingHTML += '</p>';
+                if ($("#showEncode").is(":checked")) {
+                    $("#test").append(encodingHTML);
+                }
+                if ($("#showQuote").is(":checked")) {
+                    $("#test").append(quoteHTML);
+                }
+                if ($("#showColor").is(":checked")) {
+                    token_list.forEach(function (token, index) {
+                        colorHTML += '<span class="bg-color-' + count + '" data-index="' + index + '">' + token + '</span>';
+                        count = (count + 1) % 5;
+                    });
+                    colorHTML += '</p>';
+                    $("#test").append(colorHTML);
+
+                    $("#test .bg-color-0, #test .bg-color-1, #test .bg-color-2, #test .bg-color-3, #test .bg-color-4").hover(
+                        function () {
+                            var index = $(this).data("index");
+                            highlightEncode(index);
+                        },
+                        function () {
+                            var index = $(this).data("index");
+                            unhighlightEncode(index);
+                        }
+                    );
+                }
+            }); 
+            isTokenized = true;
+            $("#sendButton").prop("disabled", true).addClass("btn-disabled");
+        } 
+            
+
+
+        $("#userText").keypress(function (e) {
+            // allows message to be sent with enter key only if not tokenized
+            if (e.which == 13 && !isTokenized) {
+                processTokens();
+            }
+        });
+
+        $("#sendButton").click(function () {
+            processTokens();
+        });
+
+        function clearContent() {
+            $("#test").html("");
+            $('.card-body .text-center').eq(0).html("0");
+            $('.card-body .text-center').eq(1).html("0");
+            isTokenized = false;
+            $("#sendButton").prop("disabled", false).removeClass("btn-disabled");
+
+        }
+
+        $("#clearButton").click(function () {
+            clearContent();
+        });
+        function highlightEncode(index) {
+            var colorSpan = $("#test .tokenizedResults span.bg-color-0, #test .tokenizedResults span.bg-color-1, #test .tokenizedResults span.bg-color-2, #test .tokenizedResults span.bg-color-3, #test .tokenizedResults span.bg-color-4").eq(index);
+            var encodeSpan = $("#test .tokenizedResults span").eq(index);
+            var originalColor = colorSpan.css("background-color");
+            encodeSpan.css("background-color", originalColor);
+        }
+
+        function unhighlightEncode(index) {
+            var encodeSpan = $("#test .tokenizedResults span").eq(index);
+            encodeSpan.css("background-color", "");
+        }
+    </script>
+</body>
+</html>
