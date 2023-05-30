@@ -1,6 +1,6 @@
-# Tinkering with deep learning and AI
+# Tinkering with Deep Learning & AI
 
-All of the code here corresponds to various videos I have released on my [youtube channel](https://www.youtube.com/channel/UCq_JMAyEmsmq1PUMpZRjFVg)
+All of the code here corresponds to various videos I have released on my [youtube channel](https://www.youtube.com/channel/UCq_JMAyEmsmq1PUMpZRjFVg).
 
 - [Visualizing OpenAI tokenization with tiktoken](https://youtu.be/Oxyg5I167b0)
 
