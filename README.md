@@ -18,4 +18,4 @@ All of the code here corresponds to various videos I have released on my [youtub
 
 - [OpenAI v2 Embeddings Part II](https://youtu.be/oQdgyGywfr4) 
 
-- [Azure OpenAI embeddings(https://youtu.be/PSLO-yM6eFY) This video is outdated - checkout the [official Microsoft docs](https://learn.microsoft.com/azure/cognitive-services/openai/tutorials/embeddings?tabs=command-line) for a better updated tutorial.
+- [Azure OpenAI embeddings](https://youtu.be/PSLO-yM6eFY) This video is outdated - checkout the [official Microsoft docs](https://learn.microsoft.com/azure/cognitive-services/openai/tutorials/embeddings?tabs=command-line) for a better updated tutorial.
